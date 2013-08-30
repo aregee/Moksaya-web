@@ -85,6 +85,12 @@
                                 $rootScope.$broadcast('event:auth-logout-confirmed');
                             },
 
+		        register: function(){
+			    $log.info("Preparing Signup data",data);
+			   
+			    return Restangular.all('register/').post(data)
+
+			    },
                         login: function(data){
                                 $log.info("Preparing Login Data", data);
                                 var $this = this;

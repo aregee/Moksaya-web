@@ -79,7 +79,13 @@ config(function(RestangularProvider ,$interpolateProvider ,$httpProvider ,$route
                             $log.info("Unauthenticated access to ", next.$$route)
                             $rootScope.$broadcast('event:auth-login-required')
                         }
-                    });
+                    }).
+controller("SignupController", function($log, $Session, $scope, $rootScope,$location){
+                $scope.Login = function(){
+                    $scope.$emit('event:auth-register', {username: $scope.username, password: $scope.password});
+		    $location.path("/login");
+                }
+            })
 
 
             }]);
