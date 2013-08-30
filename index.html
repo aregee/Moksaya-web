@@ -1,52 +1,17 @@
 <!DOCTYPE html>
-<html ng-app="factory.session">
+<html ng-app="Moksaya">
 <head>
 <meta charset="utf-8">
-<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css" rel="stylesheet">
+<link href="http://getbootstrap.com/dist/css/bootstrap.css" rel="stylesheet">
 <link href="//netdna.bootstrapcdn.com/font-awesome/3.0.2/css/font-awesome.css" rel="stylesheet">
+<link href="style.css" rel="stylesheet">
 </head>
 <body>
 
-<div>
-	<h4>Profile List</h4>
+<div ng-view ></div> 
 
 
 
-	 <ul>
-
-	   <li ng-repeat="profile in profile.objects">[[ profile.user ]]
-	     <ul><li>[[ profile.about_me ]]</li></ul>
-	     <ul><li ng-repeat="project in profile.projects">
-	      <ul>
-		<li>[[ project.title ]]</li>
-		<div class="thumbnail"> <a class="thumb"><img ng-src="http://localhost:8000[[ project.screenshot]]" height="400" width="400"></a></div>
-		<li><a href="[[ project.src ]]">Download Source </a></li>
-	     </ul>
-	   </li>
-	         
-	  </ul> 
-</div>
-
-
-<div ng-controller="LoginController">
-  <form ng-submit="submit()">
-              <table border="0" cellpadding="0" cellspacing="0">
-                <tr>
-                  <th>Username</th>
-                  <td><input type="text" class="login-inp" ng-model="username"/></td>
-                </tr>
-                <tr>
-                  <th>Password</th>
-                  <td><input type="password" class="login-inp" ng-model="password"/></td>
-                </tr>
-                <tr>
-                  <th></th>
-                  <td><input type="submit" class="submit-login"/></td>
-                </tr>
-              </table>
-            </form>
-
-</div>
 
 <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.min.js"></script> 
 <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.4/underscore-min.js"></script>
@@ -54,8 +19,7 @@
 <script type="text/javascript" src="http://cdn.jsdelivr.net/restangular/latest/restangular.min.js"></script>
 <script src="http-auth-interceptor.js"></script>
 <script src="factory.session.js"></script>
-<script src="app.js"></script>
-
 <script src="lscache.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
