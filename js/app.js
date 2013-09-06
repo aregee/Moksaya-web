@@ -1,36 +1,47 @@
  'use strict';
 
-angular.module('Moksaya', ['restangular','factory.session']).
+angular.module('Moksaya', ['restangular','factory.session','truncate']).
 config(function(RestangularProvider ,$interpolateProvider ,$httpProvider ,$routeProvider) {
 
       $interpolateProvider.startSymbol('[[');
       $interpolateProvider.endSymbol(']]');
       $httpProvider.defaults.useXdomain = true;
       delete $httpProvider.defaults.headers.common['X-Requested-With'];
-      
-
-      
+    
       RestangularProvider.setBaseUrl("http://127.0.0.1:8000/api/v1");
     //  RestangularProvider.setDefaultRequestParams({username:'aregee', api_key :'969c193ff42529c46b017c5090a2f85bda9374b8' });
 
        $routeProvider
        .when('/login' , { 
-	  templateUrl: '/login.html' , 
+	  templateUrl: 'views/login.html' , 
 	   controller: "LoginController"})
-      .when('/list', {
-	  templateUrl: '/list.html',
-	  controller:"ListCtrl"
-	  
-      }).otherwise({ redirectTo: '/login'});
+      .when('/wall', {
+	  templateUrl: 'views/main.html',
+	  controller:"MyProfileCtrl"
+      })
+      .when('/wall/:username', {
+	  templateUrl: 'views/profile.html',
+	  controller:"ViewCtrl"
+      })
+	.when('/register', { 
+	    templateUrl: 'views/signup.html',
+	    controller:SignupController
+
+	    })
+	.when('/registered', { 
+	    templateUrl: 'views/create_profile.html',
+	    controller:PostProfileController
+
+	    }).otherwise({ redirectTo: '/login'});
 	   
 }).controller("LoginController", function($log, $Session, $scope, $rootScope,$location){
                 $scope.Login = function(){
                     $scope.$emit('event:auth-login', {username: $scope.username, password: $scope.password});
-		    $location.path("/list");
+		    
                 }
-            }).
-
-        run(['$rootScope',
+    
+             
+            }).run(['$rootScope',
              '$log',
              '$Session',
 
@@ -45,8 +56,7 @@ config(function(RestangularProvider ,$interpolateProvider ,$httpProvider ,$route
                 $Session.refreshUser();
 
                 // Best practice would be to hook these events in your app.config
-
-                // login
+		// login
                 $rootScope.$on('event:auth-login-required', function(scope, data) {
                         $log.info("session.login-required");
                     });
@@ -54,6 +64,11 @@ config(function(RestangularProvider ,$interpolateProvider ,$httpProvider ,$route
                 $rootScope.$on('event:auth-login', function(scope, data) {
                         $log.info("session.send-login-details");
                         $Session.login(data);
+                    });
+		
+		$rootScope.$on('event:auth-join', function(scope, data) {
+                        $log.info("session.send-join-details");
+                        $Session.join(data);
                     });
 
                 $rootScope.$on('event:auth-login-confirmed', function(scope, data) {
@@ -68,33 +83,66 @@ config(function(RestangularProvider ,$interpolateProvider ,$httpProvider ,$route
                 $rootScope.$on('event:auth-logout-confirmed', function(scope, data) {
                         $log.info("session.logout-confirmed");
                     });
-
+		    
                 // session state change
                 $rootScope.$on('event:session-changed', function(scope){
                     $log.info("session.changed > ", $Session.User)
-                })
+                });
 
                 $rootScope.$on('$routeChangeSuccess', function(event, next, current) {
                         if(!$Session.User && next.$$route.loginRequired){
                             $log.info("Unauthenticated access to ", next.$$route)
                             $rootScope.$broadcast('event:auth-login-required')
                         }
-                    }).
-controller("SignupController", function($log, $Session, $scope, $rootScope,$location){
-                $scope.Login = function(){
-                    $scope.$emit('event:auth-register', {username: $scope.username, password: $scope.password});
-		    $location.path("/login");
-                }
-            })
+                    })
 
 
             }]);
 
-function ListCtrl($scope, Restangular,$log, $Session, $rootScope,$routeParams){
+function MyProfileCtrl($scope, Restangular,$log, $Session, $rootScope,$routeParams,$location){
     $scope.user = lscache.get('userData');
-    $scope.profile =  Restangular.all("profile/").getList();
-    
+    $scope.username = $routeParams.username;
+    $scope.profile =  Restangular.one("profile" , $scope.user.username).get();
+    $scope.Logout = function() { 
+	   $scope.$emit('event:auth-logout', {});
+	   $location.path("/");
+          
+	} 
   
+}
+
+//Profile View Controller 
+function ViewCtrl($scope, Restangular,$log, $Session, $rootScope,$routeParams,$location){
+    $scope.user = lscache.get('userData');
+    $scope.username = $routeParams.username;
+    $scope.profile =  Restangular.one("profile" , $scope.username).get();
+      
+}
+
+function SignupController($log,Restangular,$Session,$scope,$rootScope,$location){
+		$scope.Signup = function(){Restangular.all('register').post($scope.register).then(function(register)
+{
+$scope.$emit('event:auth-join', {username: $scope.register.username, password: $scope.register.password});
+
+})}
+
+}
+
+
+function PostProfileController($rootScope,Restangular, $location , $Session, $scope ) {
+      $scope.user = lscache.get('userData');
+    
+    var data = {
+	
+	user : '/api/v1/user/'+lscache.get('userData').username+'/',
+	about_me : "Howdy partner, this is "+lscache.get('userData').username+"'s Moksaya Profile"
+	};
+    
+    var base = Restangular.all("profile");
+	base.post(data).then(function(profile) {
+	$location.path("/wall");
+	})
+
 }
 
 

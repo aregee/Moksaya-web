@@ -57,18 +57,24 @@
      */
 
     angular.module("factory.session",['http-auth-interceptor','restangular'])
-        .constant('constSessionExpiry', 20) // in minutes
+        .constant('constSessionExpiry', 20)// in minutes
+        .config(function(RestangularProvider)
+		{
+		    RestangularProvider.setRequestSuffix('/');
+		    
+		 }
+		)
         .factory("$Session", [
                 '$rootScope',
                 '$q',
                 '$location',
                 '$log',
                 '$http',
-                'Restangular',
+	        'Restangular',
                 'authService',
                 'constSessionExpiry',
 
-                function($rootScope, $q, $location, $log, $http, Restangular, authService, constSessionExpiry) {
+                function($rootScope, $q, $location, $log, $http, Restangular, authService, constSessionExpiry ) {
 	         return {
 			
                         loginInProgress: false,
@@ -77,25 +83,28 @@
                                 this.loginInProgress = false;
                                 $rootScope.$broadcast('event:session-changed');
                                 authService.loginConfirmed();
+			        $location.path("/wall");
+                            },
+		       authSuccess2: function(){
+                                this.loginInProgress = false;
+                                $rootScope.$broadcast('event:session-changed');
+                                authService.loginConfirmed();
+			        $location.path("/registered");
                             },
 
-                        logout: function(){
+		        logout: function(){
                                 $log.info("Handling request for logout");
                                 this.wipeUser();
                                 $rootScope.$broadcast('event:auth-logout-confirmed');
+			        $location.path("/");
                             },
 
-		        register: function(){
-			    $log.info("Preparing Signup data",data);
-			   
-			    return Restangular.all('register/').post(data)
-
-			    },
+		     
                         login: function(data){
                                 $log.info("Preparing Login Data", data);
                                 var $this = this;
                                 return Restangular
-                                        .all('user/login/')
+                                        .all('user/login')
                                         .post(data)
                                         .then(function userLoginSuccess(response){
                                             $log.info("login.post: auth-success", response);
@@ -113,6 +122,31 @@
                                             return $q.reject(response);
                                         });
                             },
+
+		        join: function(data){
+                                $log.info("Preparing Login Data", data);
+                                var $this = this;
+                                return Restangular
+                                        .all('user/login')
+                                        .post(data)
+                                        .then(function userLoginSuccess(response){
+                                            $log.info("login.post: auth-success", response);
+                                            $this.User = response;
+                                            // remove properties we don't need.
+                                            delete $this.User.route
+                                            delete $this.User.restangularCollection
+                                            $this.User.is_authenticated = true;
+                                            $this.cacheUser()
+                                            $this.setApiKeyAuthHeader();
+                                            $this.authSuccess2();
+                                        }, function userLoginFailed(response){
+                                            $log.info('login.post: auth-failed', response);
+                                            $this.logout();
+                                            return $q.reject(response);
+                                        });
+                            },
+
+
 
                         setApiKeyAuthHeader: function(){
                                 if(this.hasOwnProperty('User') && this.User){
@@ -142,7 +176,8 @@
                                 if($this.User && $this.User.hasOwnProperty('apikey') && $this.User.apikey){
                                     $this.setApiKeyAuthHeader();
                                     Restangular
-                                        .one('user', $this.User.id)
+                                        .one('user', $this.User.username)
+				        
                                         .get().then(function(response){
                                             $log.info("User data updated from server.")
                                             $this.User = response;
@@ -153,7 +188,9 @@
                                             $log.error("Error retrieving user. logging out.");
                                             $this.logout();
                                         })
-                                }
+
+				    
+                               }
 
                             },
 

@@ -1,0 +1,38 @@
+<div class="page-header">
+  <h1>[[ profile.user ]]'s <small> Profile</small></h1>
+</div>
+<div class="page-header pull-right">
+  <a href="#/list/[[ profile.username]]"><h1>[[ user.username ]]</h1> </a>
+</div>
+
+<div class="container">
+  <div class="herounit">
+    <div class="row-fluid">
+    <a href="#/list/[[ profile.username]]">My Profile</a>
+    <p>[[profile.about_me]]</p>
+    <p> Followers :<span class="badge"> [[ profile.followers.length]] </span> </p>
+    <li ng-repeat="followers in profile.followers"><a href="#/profile/[[followers]]">[[ followers ]]</a> </li>
+    
+    <p> Following :<span class="badge"> [[ profile.following.length]]</span> </p>
+    <li ng-repeat="following in profile.following"><a href="#/profile/[[ following ]]">[[ following ]]</a></li>
+
+    
+  <div class="col-sm-6 col-md-3"  ng-repeat="project in profile.projects">
+    <div class="thumbnail">
+        <img ng-src="http://127.0.0.1:8000[[ project.screenshot ]]">
+    <div class="caption">
+      <h5>[[ project.title ]]</h5>
+           <p>[[project.desc | words:10 :true ]]</p>
+        <p><a href="http://127.0.0.1:8000[[ project.src ]]" class="btn btn-primary">Download</a> <a href="#" class="btn btn-default">Fork</a> <a href="#" class="btn btn-default">Like</a></p>
+      </div>
+   </div>
+</div>
+
+    </div>
+
+  </div>
+
+
+
+
+ 
