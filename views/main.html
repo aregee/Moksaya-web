@@ -1,19 +1,27 @@
 <div class="page-header pull-right">
-  <a href="#/list/[[ profile.username]]"><h1>[[ user.username ]]</h1> </a>
+  <a href="#/wall/[[ profile.username]]"><h1>[[ user.username ]]</h1> </a>
 </div>
-<button class="btn btn-lg btn-primary  pull-right" ng-click="Logout()">Sign out</button 	 
+
+<button class="btn btn-lg btn-primary  pull-right" ng-click="Logout()">Sign out</button>
 
 <div class="herounit">
   <div class="container">
     <div class="row-fluid">
     <h1>Hello, [[ profile.user]] </h1>
-    <a href="#/list/[[ profile.username]]">My Profile</a>
-    <p>[[profile.about_me]]</p>
+    <a href="#/wall/[[ profile.username]]">My Profile</a>
+   
+    <div ng-click="hideTooltip()"><div class="tooltip" ng-click="$event.stopPropagation()" ng-show="showtooltip">
+<input type="text" ng-model="profile.about_me" />
+    </div>
+
+<p ng-click="toggleTooltip($event)">[[ profile.about_me]]</p>
+
+      </div>
     <p> Followers :<span class="badge"> [[ profile.followers.length]] </span> </p>
-    <li ng-repeat="followers in profile.followers"><a href="#/profile/[[followers]]">[[ followers ]]</a> </li>
+    <li ng-repeat="followers in profile.followers"><a href="#/wall/[[followers]]">[[ followers ]]</a> </li>
     
     <p> Following :<span class="badge"> [[ profile.following.length]]</span> </p>
-    <li ng-repeat="following in profile.following"><a href="#/profile/[[ following ]]">[[ following ]]</a></li>
+    <li ng-repeat="following in profile.following"><a href="#/wall/[[ following ]]">[[ following ]]</a></li>
     </div>
   </div>
 

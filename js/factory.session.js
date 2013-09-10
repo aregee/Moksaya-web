@@ -123,6 +123,17 @@
                                         });
                             },
 
+		        follow: function(data) {
+			    $log.info("preparing Follower Followee data", data );
+			     
+			    return Restangular
+				.all("relations")
+			        .post(data)
+			        .then(function(response) {
+				    $log.info("Created relation", response);
+				    //location.path("/wall");
+				    })},
+
 		        join: function(data){
                                 $log.info("Preparing Login Data", data);
                                 var $this = this;
@@ -146,6 +157,7 @@
                                         });
                             },
 
+		     
 
 
                         setApiKeyAuthHeader: function(){
@@ -171,6 +183,7 @@
                                 }else{
                                     $log.warn("No user available.")
                                     $rootScope.$broadcast("event:auth-login-required")
+				    $location.path("/login")
                                 }
 
                                 if($this.User && $this.User.hasOwnProperty('apikey') && $this.User.apikey){

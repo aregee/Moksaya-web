@@ -71,6 +71,11 @@ config(function(RestangularProvider ,$interpolateProvider ,$httpProvider ,$route
                         $Session.join(data);
                     });
 
+		$rootScope.$on('event:auth-follow', function(scope, data) {
+                        $log.info("session.send-follow-details");
+                        $Session.follow(data);
+                    });
+
                 $rootScope.$on('event:auth-login-confirmed', function(scope, data) {
                         $log.info("session.login-confirmed");
 		                           });
@@ -103,6 +108,20 @@ function MyProfileCtrl($scope, Restangular,$log, $Session, $rootScope,$routePara
     $scope.user = lscache.get('userData');
     $scope.username = $routeParams.username;
     $scope.profile =  Restangular.one("profile" , $scope.user.username).get();
+    
+    $scope.showtooltip = false;
+    $scope.profile.about_me = "Hello Guys";
+    $scope.hideTooltip = function() {
+	$scope.showtooltip = false;
+	}
+    $scope.toggleTooltip = function(e) {
+	e.stopPropagation();
+	$scope.showtooltip = !$scope.showtooltip;
+	}
+    
+    
+
+
     $scope.Logout = function() { 
 	   $scope.$emit('event:auth-logout', {});
 	   $location.path("/");
@@ -111,13 +130,46 @@ function MyProfileCtrl($scope, Restangular,$log, $Session, $rootScope,$routePara
   
 }
 
-//Profile View Controller 
-function ViewCtrl($scope, Restangular,$log, $Session, $rootScope,$routeParams,$location){
+//Public Profile View Controller 
+function ViewCtrl($scope,$q, Restangular,$log, $Session, $rootScope,$routeParams,$location){
     $scope.user = lscache.get('userData');
     $scope.username = $routeParams.username;
-    $scope.profile =  Restangular.one("profile" , $scope.username).get();
+    
+    
+    var defer = $q.defer();
+    defer.promise = $scope.profile = Restangular.one("profile" , $scope.username).get(); 
+    $scope.viewer= Restangular.one("profile" , $scope.user.username).get().then(function(response) {
+	var follow = Restangular.copy(response);
+	lscache.set('followerdata',follow);
+});
+
+     defer.promise.then(function(response) {
+	var data = Restangular.copy(response);
+	//console.log(data.resource_uri);
+	
+	lscache.set('followdata', data);
+        return data;
+	//alert("Hello Mr " + data.user);
+	}).then(function(data){
+	
+	    console.log('followee' + lscache.get('followdata').resource_uri);
+	    console.log('follower' + lscache.get('followerdata').resource_uri);
+	    });
+
+     
+
+    defer.resolve();
+
+  
+    $scope.Follow = function() {
+	$scope.$emit('event:auth-follow' , { follower : lscache.get('followerdata').resource_uri , followee: lscache.get('followdata').resource_uri })
+	}
+
+  
       
 }
+
+
 
 function SignupController($log,Restangular,$Session,$scope,$rootScope,$location){
 		$scope.Signup = function(){Restangular.all('register').post($scope.register).then(function(register)
@@ -128,13 +180,13 @@ $scope.$emit('event:auth-join', {username: $scope.register.username, password: $
 
 }
 
-
+//Controller to automatically populate User Profile with arbitarty data 
 function PostProfileController($rootScope,Restangular, $location , $Session, $scope ) {
       $scope.user = lscache.get('userData');
     
     var data = {
 	
-	user : '/api/v1/user/'+lscache.get('userData').username+'/',
+	user : "/api/v1/user/"+lscache.get('userData').username+"/",
 	about_me : "Howdy partner, this is "+lscache.get('userData').username+"'s Moksaya Profile"
 	};
     

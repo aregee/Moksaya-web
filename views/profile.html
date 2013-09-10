@@ -2,19 +2,20 @@
   <h1>[[ profile.user ]]'s <small> Profile</small></h1>
 </div>
 <div class="page-header pull-right">
-  <a href="#/list/[[ profile.username]]"><h1>[[ user.username ]]</h1> </a>
+  <a href="#/wall/[[ profile.username]]"><h1>[[ user.username ]]</h1> </a>
 </div>
 
 <div class="container">
   <div class="herounit">
     <div class="row-fluid">
-    <a href="#/list/[[ profile.username]]">My Profile</a>
+    <a href="#/wall/[[ profile.username]]">My Profile</a>
     <p>[[profile.about_me]]</p>
     <p> Followers :<span class="badge"> [[ profile.followers.length]] </span> </p>
-    <li ng-repeat="followers in profile.followers"><a href="#/profile/[[followers]]">[[ followers ]]</a> </li>
+    <button class="btn btn-lg " ng-click="Follow()">follow Me</button>
+    <li ng-repeat="followers in profile.followers"><a href="#/wall/[[followers]]">[[ followers ]]</a> </li>
     
     <p> Following :<span class="badge"> [[ profile.following.length]]</span> </p>
-    <li ng-repeat="following in profile.following"><a href="#/profile/[[ following ]]">[[ following ]]</a></li>
+    <li ng-repeat="following in profile.following"><a href="#/wall/[[ following ]]">[[ following ]]</a></li>
 
     
   <div class="col-sm-6 col-md-3"  ng-repeat="project in profile.projects">
