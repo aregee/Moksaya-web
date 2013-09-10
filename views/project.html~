@@ -1,6 +1,0 @@
-
-<h1> [[ project.title ]]</h1>
-
-<h2>[[ project.desc ]] </h1>
-
-<p>[[project.user ]]</p> 
