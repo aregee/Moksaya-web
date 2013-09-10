@@ -23,6 +23,10 @@ config(function(RestangularProvider ,$interpolateProvider ,$httpProvider ,$route
 	  templateUrl: 'views/profile.html',
 	  controller:"ViewCtrl"
       })
+       .when('/project/:id', {
+	    templateUrl : 'views/project.html',
+	     controller : "ProjectViewController"
+	    })
 	.when('/register', { 
 	    templateUrl: 'views/signup.html',
 	    controller:SignupController
@@ -76,6 +80,10 @@ config(function(RestangularProvider ,$interpolateProvider ,$httpProvider ,$route
                         $Session.follow(data);
                     });
 
+		$rootScope.$on('event:auth-liked', function(scope, data) {
+                        $log.info("session.send-liked-details");
+                        $Session.liked(data);
+                    });
                 $rootScope.$on('event:auth-login-confirmed', function(scope, data) {
                         $log.info("session.login-confirmed");
 		                           });
@@ -96,7 +104,7 @@ config(function(RestangularProvider ,$interpolateProvider ,$httpProvider ,$route
 
                 $rootScope.$on('$routeChangeSuccess', function(event, next, current) {
                         if(!$Session.User && next.$$route.loginRequired){
-                            $log.info("Unauthenticated access to ", next.$$route)
+                            $log.info("Unauthenticated access to ", next.$route)
                             $rootScope.$broadcast('event:auth-login-required')
                         }
                     })
@@ -104,21 +112,21 @@ config(function(RestangularProvider ,$interpolateProvider ,$httpProvider ,$route
 
             }]);
 
-function MyProfileCtrl($scope, Restangular,$log, $Session, $rootScope,$routeParams,$location){
+function MyProfileCtrl($scope,$q, Restangular,$log, $Session, $rootScope,$routeParams,$location){
     $scope.user = lscache.get('userData');
     $scope.username = $routeParams.username;
-    $scope.profile =  Restangular.one("profile" , $scope.user.username).get();
+    var defer = $q.defer();
     
-    $scope.showtooltip = false;
-    $scope.profile.about_me = "Hello Guys";
-    $scope.hideTooltip = function() {
-	$scope.showtooltip = false;
-	}
-    $scope.toggleTooltip = function(e) {
-	e.stopPropagation();
-	$scope.showtooltip = !$scope.showtooltip;
-	}
-    
+    defer.promise = $scope.profile =  Restangular.one("profile" , $scope.user.username).get();
+
+    defer.promise.then(function(response) {
+	var follow = Restangular.copy(response);
+	lscache.set('followerdata',follow);
+    });
+
+    defer.resolve();
+    //var orignal = 
+    $scope.visible = false;
     
 
 
@@ -138,10 +146,7 @@ function ViewCtrl($scope,$q, Restangular,$log, $Session, $rootScope,$routeParams
     
     var defer = $q.defer();
     defer.promise = $scope.profile = Restangular.one("profile" , $scope.username).get(); 
-    $scope.viewer= Restangular.one("profile" , $scope.user.username).get().then(function(response) {
-	var follow = Restangular.copy(response);
-	lscache.set('followerdata',follow);
-});
+ 
 
      defer.promise.then(function(response) {
 	var data = Restangular.copy(response);
@@ -198,3 +203,23 @@ function PostProfileController($rootScope,Restangular, $location , $Session, $sc
 }
 
 
+
+
+function ProjectViewController($scope,$q, Restangular,$log, $Session, $rootScope,$routeParams,$location){
+    $scope.id = $routeParams.id
+    var defer = $q.defer();
+    defer.promise = $scope.project = Restangular.one("projects" , $scope.id ).get();
+    defer.promise.then(function(response){
+	var data = Restangular.copy(response);
+	lscache.set('projectData', data )}).then(function(){
+	    console.log('Project URI is ' + lscache.get('projectData').resource_uri);
+	    console.log('USer URI is ' + lscache.get('followerdata').resource_uri);
+	    });
+
+    defer.resolve();
+
+    $scope.Like = function() {
+	$scope.$emit('event:auth-liked' , { user : lscache.get('followerdata').resource_uri , liked_content_type:lscache.get('projectData').resource_uri }) }
+
+
+}

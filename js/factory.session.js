@@ -131,8 +131,19 @@
 			        .post(data)
 			        .then(function(response) {
 				    $log.info("Created relation", response);
-				    //location.path("/wall");
+				    $location.path("/wall/" + lscache.get('followdata').user );
 				    })},
+
+		        liked : function(data) {
+			 $log.info("preparing liked content  data", data );
+			 
+			 return Restangular
+			     .all("liking")
+			     .post(data)
+			     .then(function(response) {
+				 $log.info("added liking object ", response);
+				 //$location.path("/wall/" + lscache.get('followdata').user );
+			     })},
 
 		        join: function(data){
                                 $log.info("Preparing Login Data", data);
