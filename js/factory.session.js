@@ -131,7 +131,7 @@
 			        .post(data)
 			        .then(function(response) {
 				    $log.info("Created relation", response);
-				    $location.path("/wall/" + lscache.get('followdata').user );
+				    $location.path("/wall/" + lscache.get('followdata').user + '/' );
 				    })},
 
 		        liked : function(data) {
@@ -142,7 +142,18 @@
 			     .post(data)
 			     .then(function(response) {
 				 $log.info("added liking object ", response);
-				 //$location.path("/wall/" + lscache.get('followdata').user );
+				 $location.path("/project/"+ lscache.get('projectData').id + '/');
+			     })},
+		     
+		       comment : function(data) {
+			 $log.info("preparing liked content  data", data );
+			 
+			 return Restangular
+			     .all("comment")
+			     .post(data)
+			     .then(function(response) {
+				 $log.info("added comment object ", response);
+				 $location.path("/project/"+ lscache.get('projectData').id + '/');
 			     })},
 
 		        join: function(data){

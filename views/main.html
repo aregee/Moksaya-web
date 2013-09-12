@@ -8,8 +8,8 @@
   <div class="container">
     <div class="row-fluid">
     <h1>Hello, [[ profile.user]] </h1>
-    <a href="#/wall/[[ profile.username]]">My Profile</a>
-   
+    <a href="#/wall/[[ profile.username]]">My Profile</a><br>
+    <a href="#/upload/">Upload Project</a>
     <div ng-click="hideTooltip()"><div class="tooltip" ng-click="$event.stopPropagation()" ng-show="showtooltip">
 <input type="text" ng-model="profile.about_me" />
     </div>
@@ -29,12 +29,12 @@
  
   <div class="col-sm-6 col-md-3"  ng-repeat="project in profile.projects">
     <div class="thumbnail">
-        <img ng-src="http://127.0.0.1:8000[[ project.screenshot ]]">
+        <img ng-src="http://127.0.0.1:8000[[ project.screenshot ]]" height="320" width="240">
     <div class="caption">
       <h5>[[ project.title ]]</h5>
     
        <p>[[project.desc | words:10 :true ]]</p>
-        <p><a href="http://127.0.0.1:8000[[ project.src ]]" class="btn btn-primary">Download</a> <a href="#" class="btn btn-default">Fork</a> <a href="#" class="btn btn-default">Like</a></p>
+        <p><a href="http://127.0.0.1:8000[[ project.src ]]" class="btn btn-lg btn-primary">Download</a> <a href="#/project/[[project.id]]" class="btn btn-lg btn-default">view</a> <button class="btn btn-lg">Likes [[ project.Likes]]</button></p>
       </div>
    </div>
 </div>

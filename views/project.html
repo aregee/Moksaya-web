@@ -1,9 +1,33 @@
-<h1> [[ project.title ]]</h1>
+<div class="page-header">
+  <a href="#/project/[[ project.id ]]"><h1> [[ project.title ]] </h1></a>
+  <small>Owner : <a href="#/wall/[[project.user]]"> [[ project.user ]]</a></small>
+</div>
+
+
 
 <h2>[[ project.desc ]] </h1>
-
+<p>[[ project.history ]] </p>
 <p>[[project.user ]]</p> 
+<div class="thumbnail">
+        <img ng-src="http://127.0.0.1:8000[[ project.screenshot ]]">
+    <div class="caption">
+      <h5>[[ project.title ]]</h5>
+    
+       <p>[[project.desc | words:10 :true ]]</p>
+        <p><a href="http://127.0.0.1:8000[[ project.src ]]" class="btn btn-lg btn-primary">Download</a> <button class="btn btn-lg btn-default" ng-click="Fork()">Fork</button> <button class="btn btn-lg btn-primary" ng-click="Like()">lIkE  |  [[ project.Likes ]] </button> <button class="btn btn-lg btn-primary" ng-click="Delete()">Remove Project</button></p>
+      </div>
+   </div>
+<h1> Comments </h1>
+<div class="container-fluid">
+  <div class="row-fluid">
+    
+      <textarea name="Enter You comment here"  ng-model="text" ></textarea>
+      <br>
+      <button class="btn btn-lg btn-primary" ng-click="Comment()">Post</button>
+    <div class="well" ng-repeat="comment in project.comment">
+      <h1>[[ comment.user ]]</h1>
+      <p>[[ comment.text ]]</p>
+     </div>
+     </div>
+</div>
 
-<o>[[ project.Likes ]]</p>
-
-<button class="btn btn-lg " ng-click="Like()">lIkE iT</button>

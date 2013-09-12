@@ -1,6 +1,6 @@
  'use strict';
 
-angular.module('Moksaya', ['restangular','factory.session','truncate']).
+angular.module('Moksaya', ['restangular','factory.session','truncate','angularFileUpload']).
 config(function(RestangularProvider ,$interpolateProvider ,$httpProvider ,$routeProvider) {
 
       $interpolateProvider.startSymbol('[[');
@@ -26,8 +26,12 @@ config(function(RestangularProvider ,$interpolateProvider ,$httpProvider ,$route
        .when('/project/:id', {
 	    templateUrl : 'views/project.html',
 	     controller : "ProjectViewController"
+	    }) 
+        .when('/upload', {
+	    templateUrl : 'views/project_upload.html',
+	     controller : "ProjectUploadController"
 	    })
-	.when('/register', { 
+    	.when('/register', { 
 	    templateUrl: 'views/signup.html',
 	    controller:SignupController
 
@@ -84,6 +88,11 @@ config(function(RestangularProvider ,$interpolateProvider ,$httpProvider ,$route
                         $log.info("session.send-liked-details");
                         $Session.liked(data);
                     });
+
+		$rootScope.$on('event:auth-comment', function(scope, data) {
+                        $log.info("session.send-liked-details");
+                        $Session.comment(data);
+                    });
                 $rootScope.$on('event:auth-login-confirmed', function(scope, data) {
                         $log.info("session.login-confirmed");
 		                           });
@@ -104,7 +113,7 @@ config(function(RestangularProvider ,$interpolateProvider ,$httpProvider ,$route
 
                 $rootScope.$on('$routeChangeSuccess', function(event, next, current) {
                         if(!$Session.User && next.$$route.loginRequired){
-                            $log.info("Unauthenticated access to ", next.$route)
+                            $log.info("Unauthenticated access to ", next.$$route)
                             $rootScope.$broadcast('event:auth-login-required')
                         }
                     })
@@ -217,9 +226,52 @@ function ProjectViewController($scope,$q, Restangular,$log, $Session, $rootScope
 	    });
 
     defer.resolve();
-
+    
+    
     $scope.Like = function() {
 	$scope.$emit('event:auth-liked' , { user : lscache.get('followerdata').resource_uri , liked_content_type:lscache.get('projectData').resource_uri }) }
 
+    $scope.Fork = function(){ Restangular.one("forking", $scope.id ).get();
+			      $location.path("/wall")
+			     }
+    
+    $scope.Delete = function() { Restangular.one("projects", $scope.id).remove();
+			       $location.path("/wall");}
 
+
+    $scope.Comment = function() {
+	$scope.$emit('event:auth-comment' , { user : lscache.get('followerdata').resource_uri  , entry : lscache.get('projectData').resource_uri , text : $scope.text } )
+	}
+		     
+    
+ }
+
+
+
+function ProjectUploadController($scope,$q, Restangular,$log, $Session, $rootScope,$routeParams,$location ,$http)
+{   
+
+$scope.onFileSelect = function($files) {
+    //$files: an array of files selected, each file has name, size, and type.
+    //for (var i = 0; i < $files.length; i++) {
+      //var $file = $files[i];
+      $http.uploadFile({
+        url: 'http://127.0.0.1:8000/api/v1/projects/', //upload.php script, node.js route, or servlet uplaod url)
+        data: {user: lscache.get('followerdata').resource_uri , title: $scope.myTitle , desc:$scope.myDesc },
+	 
+        file: $files[0],
+	  
+	screen: $files[1]
+		  
+
+
+      }).then(function(data, status, headers, config) {
+        // file is uploaded successfully
+	$location.path("/wall");
+        console.log(data);
+	
+      }); 
+    //} 
+
+}
 }
