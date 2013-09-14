@@ -83,9 +83,11 @@
                                 this.loginInProgress = false;
                                 $rootScope.$broadcast('event:session-changed');
                                 authService.loginConfirmed();
-			        $location.path("/wall");
+			        
+		 	        $location.path("/wall");
+			        
                             },
-		       authSuccess2: function(){
+		        authSuccess2: function(){
                                 this.loginInProgress = false;
                                 $rootScope.$broadcast('event:session-changed');
                                 authService.loginConfirmed();
@@ -96,7 +98,7 @@
                                 $log.info("Handling request for logout");
                                 this.wipeUser();
                                 $rootScope.$broadcast('event:auth-logout-confirmed');
-			        $location.path("/");
+			        $location.path("/login/");
                             },
 
 		     
@@ -131,7 +133,7 @@
 			        .post(data)
 			        .then(function(response) {
 				    $log.info("Created relation", response);
-				    $location.path("/wall/" + lscache.get('followdata').user + '/' );
+				    $location.path("/wall/" + lscache.get('frienddata').user + '/' );
 				    })},
 
 		        liked : function(data) {
@@ -145,7 +147,7 @@
 				 $location.path("/project/"+ lscache.get('projectData').id + '/');
 			     })},
 		     
-		       comment : function(data) {
+		        comment : function(data) {
 			 $log.info("preparing liked content  data", data );
 			 
 			 return Restangular
@@ -182,8 +184,8 @@
 		     
 
 
-                        setApiKeyAuthHeader: function(){
-                                if(this.hasOwnProperty('User') && this.User){
+                      setApiKeyAuthHeader: function(){
+                               if(this.hasOwnProperty('User') && this.User){
                                     $http.defaults.headers.common.Authorization = "apikey "+this.User.username+':'+this.User.apikey;
                                     $log.info("Setting Authorization Header", $http.defaults.headers.common.Authorization)
                                 }else{
@@ -246,11 +248,99 @@
                         wipeUser: function(){
                                 $log.info("Wiping User");
                                 lscache.remove('userData');
+			        lscache.remove('profiledata');
+			        lscache.remove('frienddata');
+			        lscache.remove('projectdata');
                                 this.User = null;
                                 this.setApiKeyAuthHeader();
                                 $rootScope.$broadcast('event:session-changed');
                             }
                     };
+            }]).controller("LoginController", function($log, $Session, $scope, $rootScope,$location){
+                $scope.Login = function(){
+                    $scope.$emit('event:auth-login', {username: $scope.username, password: $scope.password});
+		    
+                }
+    
+             
+            }).run(['$rootScope',
+             '$log',
+             '$Session',
+
+            function($rootScope, $log, $Session ,$routeProvider){
+                $rootScope.Session = $Session;
+
+                //namespace the localstorage with the current domain name.
+                lscache.setBucket(window.location.hostname);
+
+                // on page refresh, ensure we have a user. if none exists
+                // then auth-login-required will be triggered.
+                $Session.refreshUser();
+
+                // Best practice would be to hook these events in your app.config
+		// login
+                $rootScope.$on('event:auth-login-required', function(scope, data) {
+                        $log.info("session.login-required");
+                    });
+
+                $rootScope.$on('event:auth-login', function(scope, data) {
+                        $log.info("session.send-login-details");
+                        $Session.login(data);
+	                
+                    });
+
+		$rootScope.$on('event:auth-refreshUser', function() {
+                    $log.info("session.send-refresh-details");
+		    //            this.refreshUser();
+	            
+                });
+		
+		$rootScope.$on('event:auth-join', function(scope, data) {
+                        $log.info("session.send-join-details");
+                        $Session.join(data);
+                    });
+
+		$rootScope.$on('event:auth-follow', function(scope, data) {
+                        $log.info("session.send-follow-details");
+                        $Session.follow(data);
+                    });
+
+		$rootScope.$on('event:auth-liked', function(scope, data) {
+                        $log.info("session.send-liked-details");
+                        $Session.liked(data);
+                    });
+
+		$rootScope.$on('event:auth-comment', function(scope, data) {
+                        $log.info("session.send-liked-details");
+                        $Session.comment(data);
+                    });
+                $rootScope.$on('event:auth-login-confirmed', function(scope, data) {
+                        $log.info("session.login-confirmed");
+		        //$Session.refreshUser();
+		                           });
+
+                // logout
+                $rootScope.$on('event:auth-logout', function(scope, data) {
+                        $log.info("session.request-logout");
+                        $Session.logout();
+                    });
+                $rootScope.$on('event:auth-logout-confirmed', function(scope, data) {
+                        $log.info("session.logout-confirmed");
+                    });
+		    
+                // session state change
+                $rootScope.$on('event:session-changed', function(scope){
+                    $log.info("session.changed > ", $Session.User)
+                });
+
+                $rootScope.$on('$routeChangeSuccess', function(event, next, current) {
+                        if(!$Session.User && next.$$route.loginRequired){
+                            $log.info("Unauthenticated access to ", next.$$route)
+                            $rootScope.$broadcast('event:auth-login-required')
+                        }
+                    })
+
+
             }])
 
 })();

@@ -12,6 +12,7 @@
     <p>[[profile.about_me]]</p>
     <p> Followers :<span class="badge"> [[ profile.followers.length]] </span> </p>
     <button class="btn btn-lg " ng-click="Follow()">follow Me</button>
+   
     <li ng-repeat="followers in profile.followers"><a href="#/wall/[[followers]]">[[ followers ]]</a> </li>
     
     <p> Following :<span class="badge"> [[ profile.following.length]]</span> </p>

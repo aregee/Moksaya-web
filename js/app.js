@@ -8,8 +8,8 @@ config(function(RestangularProvider ,$interpolateProvider ,$httpProvider ,$route
       $httpProvider.defaults.useXdomain = true;
       delete $httpProvider.defaults.headers.common['X-Requested-With'];
     
-      RestangularProvider.setBaseUrl("http://127.0.0.1:8000/api/v1");
-    //  RestangularProvider.setDefaultRequestParams({username:'aregee', api_key :'969c193ff42529c46b017c5090a2f85bda9374b8' });
+      RestangularProvider.setBaseUrl("http://127.0.0.1:8000/api/v1/");
+
 
        $routeProvider
        .when('/login' , { 
@@ -42,141 +42,63 @@ config(function(RestangularProvider ,$interpolateProvider ,$httpProvider ,$route
 
 	    }).otherwise({ redirectTo: '/login'});
 	   
-}).controller("LoginController", function($log, $Session, $scope, $rootScope,$location){
-                $scope.Login = function(){
-                    $scope.$emit('event:auth-login', {username: $scope.username, password: $scope.password});
-		    
-                }
-    
-             
-            }).run(['$rootScope',
-             '$log',
-             '$Session',
-
-            function($rootScope, $log, $Session ,$routeProvider){
-                $rootScope.Session = $Session;
-
-                //namespace the localstorage with the current domain name.
-                lscache.setBucket(window.location.hostname);
-
-                // on page refresh, ensure we have a user. if none exists
-                // then auth-login-required will be triggered.
-                $Session.refreshUser();
-
-                // Best practice would be to hook these events in your app.config
-		// login
-                $rootScope.$on('event:auth-login-required', function(scope, data) {
-                        $log.info("session.login-required");
-                    });
-
-                $rootScope.$on('event:auth-login', function(scope, data) {
-                        $log.info("session.send-login-details");
-                        $Session.login(data);
-                    });
-		
-		$rootScope.$on('event:auth-join', function(scope, data) {
-                        $log.info("session.send-join-details");
-                        $Session.join(data);
-                    });
-
-		$rootScope.$on('event:auth-follow', function(scope, data) {
-                        $log.info("session.send-follow-details");
-                        $Session.follow(data);
-                    });
-
-		$rootScope.$on('event:auth-liked', function(scope, data) {
-                        $log.info("session.send-liked-details");
-                        $Session.liked(data);
-                    });
-
-		$rootScope.$on('event:auth-comment', function(scope, data) {
-                        $log.info("session.send-liked-details");
-                        $Session.comment(data);
-                    });
-                $rootScope.$on('event:auth-login-confirmed', function(scope, data) {
-                        $log.info("session.login-confirmed");
-		                           });
-
-                // logout
-                $rootScope.$on('event:auth-logout', function(scope, data) {
-                        $log.info("session.request-logout");
-                        $Session.logout();
-                    });
-                $rootScope.$on('event:auth-logout-confirmed', function(scope, data) {
-                        $log.info("session.logout-confirmed");
-                    });
-		    
-                // session state change
-                $rootScope.$on('event:session-changed', function(scope){
-                    $log.info("session.changed > ", $Session.User)
-                });
-
-                $rootScope.$on('$routeChangeSuccess', function(event, next, current) {
-                        if(!$Session.User && next.$$route.loginRequired){
-                            $log.info("Unauthenticated access to ", next.$$route)
-                            $rootScope.$broadcast('event:auth-login-required')
-                        }
-                    })
-
-
-            }]);
+});
 
 function MyProfileCtrl($scope,$q, Restangular,$log, $Session, $rootScope,$routeParams,$location){
     $scope.user = lscache.get('userData');
-    $scope.username = $routeParams.username;
-    var defer = $q.defer();
     
-    defer.promise = $scope.profile =  Restangular.one("profile" , $scope.user.username).get();
-
+     
+     
+     var defer = $q.defer();
+    
+    defer.promise = $scope.profile = Restangular.one("profile" , $scope.user.username).get();
+    
     defer.promise.then(function(response) {
 	var follow = Restangular.copy(response);
-	lscache.set('followerdata',follow);
+	lscache.set('profiledata',follow);
     });
-
     defer.resolve();
-    //var orignal = 
-    $scope.visible = false;
-    
+  
 
 
     $scope.Logout = function() { 
 	   $scope.$emit('event:auth-logout', {});
-	   $location.path("/");
+	  
           
 	} 
   
 }
 
 //Public Profile View Controller 
-function ViewCtrl($scope,$q, Restangular,$log, $Session, $rootScope,$routeParams,$location){
-    $scope.user = lscache.get('userData');
+function ViewCtrl($scope,$q, Restangular,$log, $Session, $rootScope,$routeParams,$location,$http){
+    $scope.user = lscache.get('userData').username;
     $scope.username = $routeParams.username;
-    
+    $http.defaults.headers.common.Authorization = "apikey "+lscache.get('userData').username+':'+lscache.get('userData').apikey;
     
     var defer = $q.defer();
     defer.promise = $scope.profile = Restangular.one("profile" , $scope.username).get(); 
- 
 
      defer.promise.then(function(response) {
 	var data = Restangular.copy(response);
 	//console.log(data.resource_uri);
 	
-	lscache.set('followdata', data);
+	lscache.set('frienddata', data);
         return data;
 	//alert("Hello Mr " + data.user);
 	}).then(function(data){
 	
-	    console.log('followee' + lscache.get('followdata').resource_uri);
-	    console.log('follower' + lscache.get('followerdata').resource_uri);
+	    console.log('followee' + lscache.get('frienddata').resource_uri);
+	    console.log('follower' + lscache.get('profiledata').resource_uri);
 	    });
 
      
 
     defer.resolve();
 
+
   
     $scope.Follow = function() {
-	$scope.$emit('event:auth-follow' , { follower : lscache.get('followerdata').resource_uri , followee: lscache.get('followdata').resource_uri })
+	$scope.$emit('event:auth-follow', { follower : lscache.get('profiledata').resource_uri , followee: lscache.get('frienddata').resource_uri })
 	}
 
   
@@ -197,7 +119,7 @@ $scope.$emit('event:auth-join', {username: $scope.register.username, password: $
 //Controller to automatically populate User Profile with arbitarty data 
 function PostProfileController($rootScope,Restangular, $location , $Session, $scope ) {
       $scope.user = lscache.get('userData');
-    
+       
     var data = {
 	
 	user : "/api/v1/user/"+lscache.get('userData').username+"/",
@@ -214,22 +136,32 @@ function PostProfileController($rootScope,Restangular, $location , $Session, $sc
 
 
 
-function ProjectViewController($scope,$q, Restangular,$log, $Session, $rootScope,$routeParams,$location){
+function ProjectViewController($scope,$q, Restangular,$log, $Session, $rootScope,$routeParams,$location,$http){   $scope.user = lscache.get('userData');
+    													    
     $scope.id = $routeParams.id
+													    $http.defaults.headers.common.Authorization = "apikey "+lscache.get('userData').username+':'+lscache.get('userData').apikey;
+													    $log.info("Setting Authorization Header", $http.defaults.headers.common.Authorization)
+
+													     
+													    
     var defer = $q.defer();
-    defer.promise = $scope.project = Restangular.one("projects" , $scope.id ).get();
+
+    defer.promise = $scope.project= Restangular.one("projects" , $scope.id ).get();
     defer.promise.then(function(response){
 	var data = Restangular.copy(response);
-	lscache.set('projectData', data )}).then(function(){
-	    console.log('Project URI is ' + lscache.get('projectData').resource_uri);
-	    console.log('USer URI is ' + lscache.get('followerdata').resource_uri);
-	    });
+	lscache.set('projectData', data, 10);
+	console.log('Project URI is ' + lscache.get('projectData').resource_uri);
+	console.log('USer URI is ' + lscache.get('profiledata').resource_uri);
+    });
+	    
+	    
 
     defer.resolve();
     
-    
+   
+
     $scope.Like = function() {
-	$scope.$emit('event:auth-liked' , { user : lscache.get('followerdata').resource_uri , liked_content_type:lscache.get('projectData').resource_uri }) }
+	$scope.$emit('event:auth-liked' , { user : lscache.get('profiledata').resource_uri , liked_content_type:lscache.get('projectData').resource_uri }) }
 
     $scope.Fork = function(){ Restangular.one("forking", $scope.id ).get();
 			      $location.path("/wall")
@@ -240,7 +172,8 @@ function ProjectViewController($scope,$q, Restangular,$log, $Session, $rootScope
 
 
     $scope.Comment = function() {
-	$scope.$emit('event:auth-comment' , { user : lscache.get('followerdata').resource_uri  , entry : lscache.get('projectData').resource_uri , text : $scope.text } )
+	$scope.$emit('event:auth-comment' , { user : lscache.get('profiledata').resource_uri  , entry : lscache.get('projectData').resource_uri , text : $scope.text } )
+
 	}
 		     
     
@@ -251,17 +184,61 @@ function ProjectViewController($scope,$q, Restangular,$log, $Session, $rootScope
 function ProjectUploadController($scope,$q, Restangular,$log, $Session, $rootScope,$routeParams,$location ,$http)
 {   
 
+$http.defaults.headers.common.Authorization = "apikey "+lscache.get('userData').username+':'+lscache.get('userData').apikey;
+
+
+
 $scope.onFileSelect = function($files) {
     //$files: an array of files selected, each file has name, size, and type.
-    //for (var i = 0; i < $files.length; i++) {
-      //var $file = $files[i];
+   var $file, $screen;
+   var extension;
+   function isImage(name) {
+	   var ext = name; 
+	   switch (ext) {
+	   case 'jpg':
+	   case 'gif':
+	   case 'bmp':
+	   case 'png':
+	   case 'jpeg':
+               //etc
+               return true;
+	   }
+	   return false;
+       } 
+      
+   for (var i = 0; i < 2; i++) {
+       var name = $files[i].name;
+       name = name.toLowerCase();
+       
+       //console.log("total files" + $files.length);
+       //console.log("name is" + name);
+       //console.log("extension " + (/[.]/.exec(name))? /[^.]+$/.exec(name):undefined);
+       extension = (/[.]/.exec(name))? /[^.]+$/.exec(name):undefined;
+       
+
+       //console.log(isImage(extension[0])); 
+
+       if( isImage(extension[0]) === true )
+	   {
+	 //     console.log("is a valid image");
+	       $screen = $files[i];
+	       }
+       else{
+	   $file = $files[i];
+	  // console.log("LEts move ahead");
+	   }
+		   
+	       
+
+       }
+
       $http.uploadFile({
         url: 'http://127.0.0.1:8000/api/v1/projects/', //upload.php script, node.js route, or servlet uplaod url)
-        data: {user: lscache.get('followerdata').resource_uri , title: $scope.myTitle , desc:$scope.myDesc },
+        data: {user: lscache.get('profiledata').resource_uri , title: $scope.myTitle , desc:$scope.myDesc },
 	 
-        file: $files[0],
+        screen:$screen,
 	  
-	screen: $files[1]
+	file:$file
 		  
 
 
@@ -271,7 +248,9 @@ $scope.onFileSelect = function($files) {
         console.log(data);
 	
       }); 
-    //} 
+     
+
+    
 
 }
 }
