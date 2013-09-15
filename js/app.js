@@ -19,6 +19,11 @@ config(function(RestangularProvider ,$interpolateProvider ,$httpProvider ,$route
 	  templateUrl: 'views/main.html',
 	  controller:"MyProfileCtrl"
       })
+	.when('/wall/edit', { 
+	    templateUrl: 'views/profile_edit.html',
+	    controller:"ProfileEditController"
+
+	})
       .when('/wall/:username', {
 	  templateUrl: 'views/profile.html',
 	  controller:"ViewCtrl"
@@ -26,7 +31,12 @@ config(function(RestangularProvider ,$interpolateProvider ,$httpProvider ,$route
        .when('/project/:id', {
 	    templateUrl : 'views/project.html',
 	     controller : "ProjectViewController"
-	    }) 
+	    })
+       .when('/project/edit/:id', {
+	    templateUrl : 'views/project_edit.html',
+	     controller : "ProjectEditController"
+	    })
+
         .when('/upload', {
 	    templateUrl : 'views/project_upload.html',
 	     controller : "ProjectUploadController"
@@ -36,6 +46,7 @@ config(function(RestangularProvider ,$interpolateProvider ,$httpProvider ,$route
 	    controller:SignupController
 
 	    })
+       
 	.when('/registered', { 
 	    templateUrl: 'views/create_profile.html',
 	    controller:PostProfileController
@@ -136,14 +147,15 @@ function PostProfileController($rootScope,Restangular, $location , $Session, $sc
 
 
 
-function ProjectViewController($scope,$q, Restangular,$log, $Session, $rootScope,$routeParams,$location,$http){   $scope.user = lscache.get('userData');
-    													    
+function ProjectViewController($scope,$q, Restangular,$log, $Session, $rootScope,$routeParams,$location,$http){   
+    $scope.user = lscache.get('userData');
+    
     $scope.id = $routeParams.id
-													    $http.defaults.headers.common.Authorization = "apikey "+lscache.get('userData').username+':'+lscache.get('userData').apikey;
-													    $log.info("Setting Authorization Header", $http.defaults.headers.common.Authorization)
+    $http.defaults.headers.common.Authorization = "apikey "+lscache.get('userData').username+':'+lscache.get('userData').apikey;
+    $log.info("Setting Authorization Header", $http.defaults.headers.common.Authorization)
 
-													     
-													    
+    
+    
     var defer = $q.defer();
 
     defer.promise = $scope.project= Restangular.one("projects" , $scope.id ).get();
@@ -153,35 +165,35 @@ function ProjectViewController($scope,$q, Restangular,$log, $Session, $rootScope
 	console.log('Project URI is ' + lscache.get('projectData').resource_uri);
 	console.log('USer URI is ' + lscache.get('profiledata').resource_uri);
     });
-	    
-	    
+    
+    
 
     defer.resolve();
     
-   
+    
 
     $scope.Like = function() {
 	$scope.$emit('event:auth-liked' , { user : lscache.get('profiledata').resource_uri , liked_content_type:lscache.get('projectData').resource_uri }) }
 
     $scope.Fork = function(){ Restangular.one("forking", $scope.id ).get();
 			      $location.path("/wall")
-			     }
+			    }
     
     $scope.Delete = function() { Restangular.one("projects", $scope.id).remove();
-			       $location.path("/wall");}
+				 $location.path("/wall");}
 
 
     $scope.Comment = function() {
 	$scope.$emit('event:auth-comment' , { user : lscache.get('profiledata').resource_uri  , entry : lscache.get('projectData').resource_uri , text : $scope.text } )
 
-	}
-		     
+    }
     
- }
+    
+}
 
 
 
-function ProjectUploadController($scope,$q, Restangular,$log, $Session, $rootScope,$routeParams,$location ,$http)
+function ProjectUploadController($scope,$q, Restangular,$log, $Session,$location ,$http)
 {   
 
 $http.defaults.headers.common.Authorization = "apikey "+lscache.get('userData').username+':'+lscache.get('userData').apikey;
@@ -254,3 +266,130 @@ $scope.onFileSelect = function($files) {
 
 }
 }
+
+
+function ProfileEditController($scope,Restangular,$http,$location)
+{
+    
+    $scope.username = lscache.get('profiledata').user;    
+    $http.defaults.headers.common.Authorization = "apikey "+lscache.get('userData').username+':'+lscache.get('userData').apikey;
+ 
+    Restangular.one('profile', $scope.username).get().then(function(profile){
+	
+	$scope.profile = Restangular.copy(profile);
+        console.log($scope.profile);
+	
+	
+   	
+	$scope.submit = function() {
+	    
+	    $scope.profile.patch().then(function() {
+	    $location.path("/wall");
+		});}
+});
+	    
+
+
+}
+	
+	
+	
+function ProjectEditController($scope, Restangular, $rootScope, $routeParams,$http,$log,$location)
+{
+    $scope.id = $routeParams.id
+    $http.defaults.headers.common.Authorization = "apikey "+lscache.get('userData').username+':'+lscache.get('userData').apikey;
+    $log.info("Setting Authorization Header", $http.defaults.headers.common.Authorization)
+    $scope.project = Restangular.one("projects", $scope.id).get();
+   
+
+
+    $scope.onFileSelect = function($files) {
+    //$files: an array of files selected, each file has name, size, and type.
+   var $file, $screen;
+   var extension;
+   function isImage(name) {
+	   var ext = name; 
+	   switch (ext) {
+	   case 'jpg':
+	   case 'gif':
+	   case 'bmp':
+	   case 'png':
+	   case 'jpeg':
+               //etc
+               return true;
+	   }
+	   return false;
+       } 
+      
+   for (var i = 0; i < 2; i++) {
+       var name = $files[i].name;
+       name = name.toLowerCase();
+       
+       //console.log("total files" + $files.length);
+       //console.log("name is" + name);
+       //console.log("extension " + (/[.]/.exec(name))? /[^.]+$/.exec(name):undefined);
+       extension = (/[.]/.exec(name))? /[^.]+$/.exec(name):undefined;
+       
+
+       //console.log(isImage(extension[0])); 
+       
+       if( isImage(extension[0]) === true )
+	   {
+	 //     console.log("is a valid image");
+	       $screen = $files[i];
+	       }
+       else{
+	   $file = $files[i];
+	  // console.log("LEts move ahead");
+	   }
+		   
+	       
+
+       }
+
+      $http.uploadFile({
+	
+	method: 'PUT',
+
+        url: 'http://127.0.0.1:8000/api/v1/projects/'+lscache.get('projectData').id+'/' , //upload.php script, node.js route, or servlet uplaod url)
+        data: {user: lscache.get('profiledata').resource_uri , title: $scope.myTitle , desc:$scope.myDesc },
+	 
+        screen:$screen,
+	  
+	file:$file
+		  
+
+
+      }).then(function(data, status, headers, config) {
+        // file is uploaded successfully
+	$location.path("/wall");
+        console.log(data);
+	
+      });
+} 
+     
+
+
+
+
+
+
+
+    
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

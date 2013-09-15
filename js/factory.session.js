@@ -98,7 +98,7 @@
                                 $log.info("Handling request for logout");
                                 this.wipeUser();
                                 $rootScope.$broadcast('event:auth-logout-confirmed');
-			        $location.path("/login/");
+			        $location.path("/login");
                             },
 
 		     
