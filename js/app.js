@@ -147,48 +147,49 @@ function PostProfileController($rootScope,Restangular, $location , $Session, $sc
 
 
 
-function ProjectViewController($scope,$q, Restangular,$log, $Session, $rootScope,$routeParams,$location,$http){   $scope.user = lscache.get('userData');
-    														  
-														  $scope.id = $routeParams.id
-														  $http.defaults.headers.common.Authorization = "apikey "+lscache.get('userData').username+':'+lscache.get('userData').apikey;
-														  $log.info("Setting Authorization Header", $http.defaults.headers.common.Authorization)
+function ProjectViewController($scope,$q, Restangular,$log, $Session, $rootScope,$routeParams,$location,$http){   
+    $scope.user = lscache.get('userData');
+    
+    $scope.id = $routeParams.id
+    $http.defaults.headers.common.Authorization = "apikey "+lscache.get('userData').username+':'+lscache.get('userData').apikey;
+    $log.info("Setting Authorization Header", $http.defaults.headers.common.Authorization)
 
-														  
-														  
-														  var defer = $q.defer();
+    
+    
+    var defer = $q.defer();
 
-														  defer.promise = $scope.project= Restangular.one("projects" , $scope.id ).get();
-														  defer.promise.then(function(response){
-														      var data = Restangular.copy(response);
-														      lscache.set('projectData', data, 10);
-														      console.log('Project URI is ' + lscache.get('projectData').resource_uri);
-														      console.log('USer URI is ' + lscache.get('profiledata').resource_uri);
-														  });
-														  
-														  
+    defer.promise = $scope.project= Restangular.one("projects" , $scope.id ).get();
+    defer.promise.then(function(response){
+	var data = Restangular.copy(response);
+	lscache.set('projectData', data, 10);
+	console.log('Project URI is ' + lscache.get('projectData').resource_uri);
+	console.log('USer URI is ' + lscache.get('profiledata').resource_uri);
+    });
+    
+    
 
-														  defer.resolve();
-														  
-														  
+    defer.resolve();
+    
+    
 
-														  $scope.Like = function() {
-														      $scope.$emit('event:auth-liked' , { user : lscache.get('profiledata').resource_uri , liked_content_type:lscache.get('projectData').resource_uri }) }
+    $scope.Like = function() {
+	$scope.$emit('event:auth-liked' , { user : lscache.get('profiledata').resource_uri , liked_content_type:lscache.get('projectData').resource_uri }) }
 
-														  $scope.Fork = function(){ Restangular.one("forking", $scope.id ).get();
-																	    $location.path("/wall")
-																	  }
-														  
-														  $scope.Delete = function() { Restangular.one("projects", $scope.id).remove();
-																	       $location.path("/wall");}
+    $scope.Fork = function(){ Restangular.one("forking", $scope.id ).get();
+			      $location.path("/wall")
+			    }
+    
+    $scope.Delete = function() { Restangular.one("projects", $scope.id).remove();
+				 $location.path("/wall");}
 
 
-														  $scope.Comment = function() {
-														      $scope.$emit('event:auth-comment' , { user : lscache.get('profiledata').resource_uri  , entry : lscache.get('projectData').resource_uri , text : $scope.text } )
+    $scope.Comment = function() {
+	$scope.$emit('event:auth-comment' , { user : lscache.get('profiledata').resource_uri  , entry : lscache.get('projectData').resource_uri , text : $scope.text } )
 
-														  }
-														  
-														  
-													      }
+    }
+    
+    
+}
 
 
 
