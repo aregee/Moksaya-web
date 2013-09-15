@@ -316,8 +316,7 @@
                     });
                 $rootScope.$on('event:auth-login-confirmed', function(scope, data) {
                         $log.info("session.login-confirmed");
-		        //$Session.refreshUser();
-		                           });
+		                            });
 
                 // logout
                 $rootScope.$on('event:auth-logout', function(scope, data) {

@@ -1,0 +1,12 @@
+<div>
+    <q> [[ project.user ]]</q>
+
+    <input type="text" ng-model="myTitle" placeholder="[[ project.title]]">
+    <input type="text" ng-model="myDesc"  placeholder="[[ project.desc ]]">
+    <img ng-src="http://127.0.0.1:8000[[ project.screenshot ]]" height="640" width="480">
+    <a href="http://127.0.0.1:8000[[ project.src ]]">Existing Source </a>
+    <input type="file"  ng-File-select="onFileSelect($files)" multiple>
+    <!-- etc -->
+
+
+</div>
