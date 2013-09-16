@@ -19,7 +19,7 @@ config(function(RestangularProvider ,$interpolateProvider ,$httpProvider ,$route
 	  templateUrl: 'views/main.html',
 	  controller:"MyProfileCtrl"
       })
-	.when('/wall/edit', { 
+	.when('/wall/edit/:username', { 
 	    templateUrl: 'views/profile_edit.html',
 	    controller:"ProfileEditController"
 
@@ -268,13 +268,13 @@ $scope.onFileSelect = function($files) {
 }
 
 
-function ProfileEditController($scope,Restangular,$http,$location)
+function ProfileEditController($scope,Restangular,$http,$location,$routeParams,$log)
 {
     
-    $scope.username = lscache.get('profiledata').user;    
+    $scope.username =  $routeParams.username; //lscache.get('profiledata').user;    
     $http.defaults.headers.common.Authorization = "apikey "+lscache.get('userData').username+':'+lscache.get('userData').apikey;
  
-    Restangular.one('profile', $scope.username).get().then(function(profile){
+ /*   Restangular.one('profile', $scope.username).get().then(function(profile){
 	
 	$scope.profile = Restangular.copy(profile);
         console.log($scope.profile);
@@ -287,8 +287,23 @@ function ProfileEditController($scope,Restangular,$http,$location)
 	    $location.path("/wall");
 		});}
 });
-	    
+*/
 
+     $scope.profile = Restangular.one('profile', $scope.username).get();
+	
+	$scope.submit = function() {
+	   
+	var  data = {
+	        user : lscache.get('userData').resource_uri,  
+		about_me : $scope.about_me
+		}
+
+	    $http({ method:'PATCH' ,url:'http://127.0.0.1:8000/api/v1/profile/'+lscache.get('userData').username+'/' ,data:{ user : lscache.get('userData').resource_uri,  
+		about_me : $scope.about_me
+		} }).then(function(){
+		$location.path('/wall');
+	    });
+	    }
 
 }
 	
@@ -304,7 +319,7 @@ function ProjectEditController($scope, Restangular, $rootScope, $routeParams,$ht
 
 
     $scope.onFileSelect = function($files) {
-    //$files: an array of files selected, each file has name, size, and type.
+	//$files: an array of files selected, each file has name, size, and type.
    var $file, $screen;
    var extension;
    function isImage(name) {

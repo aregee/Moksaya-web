@@ -8,7 +8,8 @@
   <div class="container">
     <div class="row-fluid">
     <h1>Hello, [[ profile.user]] </h1>
-    <a href="#/wall/[[ profile.username]]">My Profile</a><br>
+    <a href="#/wall/[[ profile.user]]">My Profile</a><br>
+    <a href="#/wall/edit/[[ profile.user ]]">Edit Profile </a><br>
     <a href="#/upload/">Upload Project</a>
     <div ng-click="hideTooltip()"><div class="tooltip" ng-click="$event.stopPropagation()" ng-show="showtooltip">
 <input type="text" ng-model="profile.about_me" />
