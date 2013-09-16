@@ -127,9 +127,11 @@ $scope.$emit('event:auth-join', {username: $scope.register.username, password: $
 
 }
 
+
+
 //Controller to automatically populate User Profile with arbitarty data 
 function PostProfileController($rootScope,Restangular, $location , $Session, $scope ) {
-      $scope.user = lscache.get('userData');
+    $scope.user = lscache.get('userData');
        
     var data = {
 	
