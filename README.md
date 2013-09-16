@@ -1,4 +1,5 @@
-Moksaya - WebInterface :
+Moksaya - WebInterface :  [![Build Status](https://travis-ci.org/[aregee]/[Moksaya-web].png)](https://travis-ci.org/[aregee]/[Moksaya-web])
+
 
 ==================================================================================================
 
