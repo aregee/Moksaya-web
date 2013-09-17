@@ -300,7 +300,7 @@ function ProfileEditController($scope,Restangular,$http,$location,$routeParams,$
 		about_me : $scope.about_me
 		}
 
-	    $http({ method:'PATCH' ,url:'http://127.0.0.1:8000/api/v1/profile/'+lscache.get('userData').username+'/' ,data:{ user : lscache.get('userData').resource_uri,  
+	    $http({ method:'PUT' ,url:'http://127.0.0.1:8000/api/v1/profile/'+lscache.get('userData').username+'/' ,data:{ user : lscache.get('userData').resource_uri,  
 		about_me : $scope.about_me
 		} }).then(function(){
 		$location.path('/wall');
@@ -386,15 +386,13 @@ function ProjectEditController($scope, Restangular, $rootScope, $routeParams,$ht
 } 
      
 
-
+}
 
 
 
 
 
     
-
-}
 
 
 
