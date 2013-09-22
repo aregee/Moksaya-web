@@ -1,0 +1,64 @@
+<title>[[project.user]] |[[ project.title | words:10 :true]]</title>
+
+<header>
+  <div class="wrapper">
+    <a href="#/wall"><img src="logo.png" alt="Sugar logo" title="Project Moksaya" height="100" width="150"/></a>
+    
+    <span id="usernav"><a href="#/upload/">Upload Project</a> - <a href="#/project/edit/[[project.id]]/">Edit Me </a> - <a href="#/wall/[[ profile.username]]">[[ user.username ]]<span><img src="user_avatar_s.jpg" /></span></a>  </span> 
+
+    </div>
+</header>
+
+<nav>
+  <ul id="n" class="clearfix">
+    <li ><a href="#/wall/">Homepage</a></li>
+    <li ><a href="#/wall/[[profile.user]]">Profile</a></li>
+    <li class="sel"><a href="#/project/[[project.id]]">Project</a></li>
+    <li ><a href="#/projects">Explore</a></li>
+    </ul>
+  </nav>
+
+<div class="notebook-paper">
+
+
+<div class="container" >
+
+<div class="thumbnail" style="margin-top:30px">
+        <img ng-src="http://moksaya-rahulgaur.rhcloud.com[[ project.screenshot ]]" >
+    <div class="caption">
+      <h1>[[ project.title ]]</h1>
+       <p class="lead"> by <a href="#/wall/[[ project.user]]">[[project.user]]</a></p>
+       <p class="lead">[[project.desc ]]</p>
+       <p class="lead">[[project.history]]</p>
+        <p><a href="http://moksaya-rahulgaur.rhcloud.com[[ project.src ]]" class="btn btn-lg btn-primary">Download</a> <button class="btn btn-lg btn-default" ng-click="Fork()">Fork</button> <button class="btn btn-lg btn-primary" ng-click="Like()">lIkE  |  [[ project.Likes ]] </button> <button class="btn btn-lg btn-primary" ng-click="Delete()">Remove Project</button></p>
+      </div>
+   </div>
+
+
+<h1> Comments </h1>
+<div class="container-fluid">
+  <div class="row-fluid">
+   <form role="form">
+       <textarea class="form-control pul-left" rows="3" name="Enter You comment here"  ng-model="text" >    
+      </textarea>
+      <button class="btn btn-lg" ng-click="Comment()">Post</button>
+   </form>
+<div  class="stick">
+   <ul>
+    <li ng-repeat="comment in project.comment">
+      <a href="#/wall/[[comment.user]]/">
+        <h2>[[ comment.user ]]</h2>
+        <p>[[comment.text ]]</p>
+      </a>
+    </li>
+  </ul>
+</div>
+
+  
+ 
+     </div>
+</div>
+
+</div>
+
+</div>

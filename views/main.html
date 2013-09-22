@@ -1,0 +1,105 @@
+<title>Moksaya | [[ user.username ]]</title>
+
+<header>
+  <div class="wrapper">
+    <a href="#/wall"><img src="logo.png" alt="Sugar logo" title="Project Moksaya" height="100" width="150"/></a>
+    
+    <span id="usernav"><a ng-click="Logout()">Sign out</a> - <a href="#/wall/edit/[[ profile.user ]]">Edit Profile </a> - <a href="#/upload/">Upload Project</a> - <a href="#/wall/[[ profile.username]]">[[ user.username ]]<span><img src="user_avatar_s.jpg" /></span></a>  </span> 
+
+    </div>
+</header>
+<nav>
+  <ul id="n" class="clearfix">
+    <li class="sel"><a href="#/wall/">Homepage</a></li>
+    <li ><a href="#/wall/[[profile.user]]">Profile</a></li>
+    <li><a href="#/projects">Explore</a></li>
+    </ul>
+  </nav>
+<div id="notebook">
+
+<div id="content" class="clearfix" >
+  <section id="left" style="margin-top:30px">
+
+
+    <div id="userStats" class="clearfix">
+      <div class="pic">
+	<a href="#"><img src="user_avatar.jpg" width="150" height="150" /></a>
+	</div>
+      
+      <div class="data">
+	<h1>[[ profile.user]]</h1>
+	<h3>[[ profile.about_me]]</h3> 
+
+	<div class="socialMediaLinks">
+
+	  </div>
+	<div class="sep"></div>
+	<ul class="numbers clearfix">
+	  <li>Followers<strong>[[ profile.followers.length ]]</strong></li>
+	  <li>Following<strong>[[ profile.following.length ]]</strong></li>
+	  <li class="nobrdr">Projects<strong>[[ profile.projects.length]]</strong></li>
+	  </ul>
+	</div>
+      </div>
+
+<div class="container" style="margin-top:50px">
+
+<div class="row-fluid">
+ 
+ 
+ <ul class="thumbnails">
+          <li class="span3" style="none;padding:20px 20px ;" ng-repeat="project in profile.projects">
+            <a href="#/project/[[project.id]]" class="thumbnail" style="background:#eee">
+              <img ng-src="http://moksaya-rahulgaur.rhcloud.com[[ project.screenshot ]]" alt="260x180" style="width: 200px; height: 160px;">
+            </a>
+	    
+	    <div class="caption">
+	      <h4>[[ project.title ]]</h4>    
+	      <h6>[[project.desc | words:4 :true ]]</h6>
+              <h5 class="lead"><a href="#/wall/[[ project.user]]"><bold>[[ project.user]]<bold></a></h5>
+              <p><a href="#/project/[[project.id]]"> <button class="btn btn-primary ">View</button></a> <a href="http://moksaya-rahulgaur.rhcloud.com[[ project.src ]]"><button class="btn btn-success">Source</button></a> <button class="btn btn-info">Likes [[ project.Likes]]</button></p>
+	      
+	    </div>
+          </li>
+</ul>   
+
+</div>
+
+</div> 
+
+
+
+    </section>
+
+<section id="right" style="margin-top:30px">
+<div class="gcontent">
+  <div class="head"><h1>Followers : [[ profile.followers.length ]]</h1></div>
+  <div class="boxy">
+      
+    <div class="friendslist clearfix">
+      <div class="friend" ng-repeat="follower in profile.followers">
+	<img src="friend_avatar_default.jpg" width="30" height="30" alt="" /><span class="friendly"><a href="#/wall/[[follower]]">[[ follower | characters:8 :true ]]</a></span>
+      </div>
+      
+    </div>
+    </div>
+
+  <div class="head" style="margin-top:30px"><h1>Following : [[ profile.following.length ]]</h1></div>
+  <div class="boxy">
+      
+    <div class="friendslist clearfix">
+      <div class="friend" ng-repeat="follower in profile.following">
+	<img src="friend_avatar_default.jpg" width="30" height="30" alt="Followers" /><span class="friendly"><a href="#/wall/[[follower]]">[[ follower | characters:8 :true ]]</a></span>
+      </div>
+      
+    </div>
+    </div>
+
+  </div>
+
+</section>
+
+
+</div>
+
+</div> <!--Adding NoteBook background-->

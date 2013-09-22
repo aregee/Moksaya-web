@@ -1,0 +1,61 @@
+<title>Moksaya | [[ user.username ]]</title>
+<style>
+
+body {
+  padding-top: 40px;
+  padding-bottom: 40px;
+  
+    background-color: #fff;
+    background-image: linear-gradient(transparent 15px, rgba(0,0,255,0.3) 15px, transparent 16px);
+    background-size: 100% 17px;
+
+
+}
+
+.form-signin {
+  max-width: 440px;
+  padding: 15px;
+  margin: 0 auto;
+}
+.form-signin .form-signin-heading,
+.form-signin .checkbox {
+  margin-bottom: 10px;
+}
+.form-signin .checkbox {
+  font-weight: normal;
+}
+.form-signin .form-control {
+  position: relative;
+  font-size: 16px;
+  height: auto;
+  padding: 10px;
+  -webkit-box-sizing: border-box;
+     -moz-box-sizing: border-box;
+          box-sizing: border-box;
+}
+
+
+label {
+ padding: 14px ;
+}
+
+</style>
+<div class="container">
+
+<form class="form-signin">
+
+    <h1 class="form-signin-heading"> Edit Profile </h1>
+
+    <h1>[[ profile.user]]</h1>
+    
+    <label> About Me :</label> 
+    <p style="margin-bottom: 10px">[[ profile.about_me]] </p>
+    <br>
+    <br>
+    <textarea class="form-control" ng-model="about_me" placeholder="Please enter a Short bio about yourself "></textarea>
+
+    <button ng-click="submit()" class="btn btn-lg">Save</button>
+
+</form>
+
+</div>

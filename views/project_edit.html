@@ -1,0 +1,55 @@
+<style>
+
+body {
+  padding-top: 40px;
+  padding-bottom: 40px;
+  
+    background-color: #fff;
+    background-image: linear-gradient(transparent 15px, rgba(0,0,255,0.3) 15px, transparent 16px);
+    background-size: 100% 17px;
+
+
+}
+
+.form-group {
+  max-width: 530px;
+  padding: 25px;
+  margin: 0 auto;
+}
+
+label {
+ padding: 14px ;
+}
+
+
+</style>
+
+
+<div class="container">
+
+    <q> [[ project.user ]]</q>
+
+<form role="form">
+
+<div class="form-group">
+  <label> Project Title</label>
+  <input type="text" class="form-control"  ng-model="myTitle" placeholder="Enter title for your project">
+  <label> Project Title</label>
+  <input type="text" class="form-control"  ng-model="myDesc"  placeholder="Enter Description for your project">
+<img ng-src="http://moksaya-rahulgaur.rhcloud.com[[ project.screenshot ]]" height="640" width="480">
+
+</div>
+    
+
+<div class="form-group">
+  <label> Select Project files to upload </label> 
+  <input type="file"  ng-File-select="onFileSelect($files)" multiple>
+  
+  <label> <a href="http://moksaya-rahulgaur.rhcloud.com[[ project.src ]]">Existing Source </a></label>
+
+ 
+  <label>Only Valid image type and Source files are accepted </label
+</div>
+
+</form>
+</div>
