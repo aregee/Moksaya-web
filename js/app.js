@@ -32,9 +32,15 @@ config(function(RestangularProvider ,$interpolateProvider ,$httpProvider ,$route
 	    templateUrl : 'views/project.html',
 	     controller : "ProjectViewController"
 	    })
+    
        .when('/project/edit/:id', {
 	    templateUrl : 'views/project_edit.html',
 	     controller : "ProjectEditController"
+	    })
+
+        .when('/projects', {
+	    templateUrl : 'views/projects_list.html',
+	     controller : "ProjectListController"
 	    })
 
         .when('/upload', {
@@ -82,7 +88,7 @@ function MyProfileCtrl($scope,$q, Restangular,$log, $Session, $rootScope,$routeP
 
 //Public Profile View Controller 
 function ViewCtrl($scope,$q, Restangular,$log, $Session, $rootScope,$routeParams,$location,$http){
-    $scope.user = lscache.get('userData').username;
+    $scope.user = lscache.get('userData');
     $scope.username = $routeParams.username;
     $http.defaults.headers.common.Authorization = "apikey "+lscache.get('userData').username+':'+lscache.get('userData').apikey;
     
@@ -136,7 +142,7 @@ function PostProfileController($rootScope,Restangular, $location , $Session, $sc
     var data = {
 	
 	user : "/api/v1/user/"+lscache.get('userData').username+"/",
-	about_me : "Howdy partner, this is "+lscache.get('userData').username+"'s Moksaya Profile"
+	about_me : "Howdy "+lscache.get('userData').username+" , this is your  Moksaya Profile"
 	};
     
     var base = Restangular.all("profile");
@@ -276,21 +282,6 @@ function ProfileEditController($scope,Restangular,$http,$location,$routeParams,$
     $scope.username =  $routeParams.username; //lscache.get('profiledata').user;    
     $http.defaults.headers.common.Authorization = "apikey "+lscache.get('userData').username+':'+lscache.get('userData').apikey;
  
- /*   Restangular.one('profile', $scope.username).get().then(function(profile){
-	
-	$scope.profile = Restangular.copy(profile);
-        console.log($scope.profile);
-	
-	
-   	
-	$scope.submit = function() {
-	    
-	    $scope.profile.patch().then(function() {
-	    $location.path("/wall");
-		});}
-});
-*/
-
      $scope.profile = Restangular.one('profile', $scope.username).get();
 	
 	$scope.submit = function() {
@@ -390,6 +381,13 @@ function ProjectEditController($scope, Restangular, $rootScope, $routeParams,$ht
 
 
 
+function ProjectListController($scope,$q, Restangular,$log, $Session, $rootScope,$routeParams,$location,$http){
+    $scope.user = lscache.get('userData');   
+    $http.defaults.headers.common.Authorization = "apikey "+lscache.get('userData').username+':'+lscache.get('userData').apikey;          
+    $scope.projects = Restangular.all("projects").getList();
+    
+  
+}
 
 
     
